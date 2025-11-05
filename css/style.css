@@ -1,0 +1,147 @@
+/* ======== ESTILOS GERAIS ======== */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Poppins", sans-serif;
+  background-color: #f1f8f4;
+  color: #2e3d31;
+}
+
+/* ======== CABEÇALHO ======== */
+.navbar {
+  background: linear-gradient(90deg, #1e8449, #27ae60);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+  color: #fff !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+}
+
+.navbar-brand img {
+  margin-right: 10px;
+}
+
+.navbar-brand:hover {
+  color: #d4f5e3 !important;
+}
+
+.navbar .nav-link {
+  color: #ffffff !important;
+  font-weight: 500;
+  margin-right: 1rem;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar .nav-link:hover {
+  color: #c3f3d1 !important;
+  text-decoration: underline;
+}
+
+.btn-login {
+  background-color: #e9f9f1;
+  color: #1e8449;
+  border-radius: 25px;
+  padding: 6px 18px;
+  font-weight: 600;
+  border: none;
+  transition: 0.3s;
+}
+
+.btn-login:hover {
+  background-color: #d4f5e3;
+  color: #145a32;
+}
+
+/* ======== CONTEÚDO PRINCIPAL ======== */
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
+}
+
+h1, h2, h3 {
+  color: #1e8449;
+  font-weight: 600;
+}
+
+/* ======== BOTÕES ======== */
+.btn-pet {
+  background-color: #27ae60;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  padding: 0.7rem 1.5rem;
+  transition: 0.3s;
+}
+
+.btn-pet:hover {
+  background-color: #219150;
+  transform: translateY(-2px);
+}
+
+/* ======== FORMULÁRIOS ======== */
+form {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 0.8rem;
+  margin-bottom: 1rem;
+  border-radius: 6px;
+  border: 1px solid #c8e6c9;
+  font-size: 1rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #27ae60;
+  outline: none;
+  box-shadow: 0 0 4px rgba(39, 174, 96, 0.3);
+}
+
+/* ======== RODAPÉ ======== */
+footer {
+  background: linear-gradient(90deg, #1e8449, #27ae60);
+  color: #ffffff;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+footer a {
+  color: #fff;
+  text-decoration: none;
+}
+
+footer a:hover {
+  color: #d4f5e3;
+}
+
+footer p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+/* ======== RESPONSIVIDADE ======== */
+@media (max-width: 768px) {
+  .navbar {
+    text-align: center;
+  }
+
+  .navbar .nav-link {
+    display: block;
+    margin: 0.5rem 0;
+  }
+
+  .container {
+    padding: 1rem;
+  }
+}
