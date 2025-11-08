@@ -1,78 +1,88 @@
 <?php
+require_once __DIR__ . '/db/conexao.php';
 session_start();
 
-// Exibe erros (ótimo pra debug)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+$mensagem = '';
 
-require_once __DIR__ . '/db/conexao.php'; // Caminho certo da conexão
-
-// Verifica se o usuário está logado
-if (!isset($_SESSION['usuario'])) {
-    header('Location: login.php');
-    exit;
-}
-
-// Quando o formulário for enviado:
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $pet = trim($_POST['pet']);
+    $pet_nome = trim($_POST['pet_nome']);
     $servico = trim($_POST['servico']);
-    $data = $_POST['data'];
+    $data_agendada = trim($_POST['data_agendada']);
+    $telefone = trim($_POST['telefone']);
+    $usuario_id = $_SESSION['usuario']['id'] ?? null;
 
-    if ($pet && $servico && $data) {
-        try {
-            $stmt = $pdo->prepare("
-                INSERT INTO agendamentos (usuario_id, pet, servico, data)
-                VALUES (?, ?, ?, ?)
-            ");
-            $stmt->execute([$_SESSION['usuario']['id'], $pet, $servico, $data]);
-            $msg = "✅ Agendamento realizado com sucesso!";
-        } catch (PDOException $e) {
-            $msg = "❌ Erro ao agendar: " . $e->getMessage();
-        }
+    if (!$usuario_id) {
+        $mensagem = "⚠️ É necessário estar logado para agendar um serviço.";
     } else {
-        $msg = "⚠️ Preencha todos os campos!";
+        try {
+            // Cria tabela se ainda não existir
+            $pdo->exec("
+                CREATE TABLE IF NOT EXISTS agendamentos (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    usuario_id INTEGER,
+                    pet_nome TEXT,
+                    servico TEXT,
+                    telefone TEXT,
+                    data_agendada TEXT,
+                    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+                )
+            ");
+
+            // Insere o agendamento
+            $stmt = $pdo->prepare("
+                INSERT INTO agendamentos (usuario_id, pet_nome, servico, telefone, data_agendada)
+                VALUES (?, ?, ?, ?, ?)
+            ");
+            $stmt->execute([$usuario_id, $pet_nome, $servico, $telefone, $data_agendada]);
+
+            $mensagem = "✅ Agendamento realizado com sucesso!";
+        } catch (PDOException $e) {
+            $mensagem = "Erro ao agendar: " . $e->getMessage();
+        }
     }
 }
 
 include 'layout_header.php';
 ?>
 
-<div class="container my-5">
-  <h2 class="text-center text-success fw-bold mb-4">📅 Agende um Serviço</h2>
+<div class="container py-5">
+  <div class="card mx-auto p-4 shadow-sm" style="max-width: 600px;">
+    <h3 class="text-center text-success mb-4">🐶 Agendar Serviço</h3>
 
-  <?php if (!empty($msg)): ?>
-    <div class="alert alert-info text-center"><?= htmlspecialchars($msg) ?></div>
-  <?php endif; ?>
+    <?php if ($mensagem): ?>
+      <div class="alert alert-info text-center"><?= htmlspecialchars($mensagem) ?></div>
+    <?php endif; ?>
 
-  <form method="POST" class="mx-auto" style="max-width: 500px;">
-    <div class="mb-3">
-      <label for="pet" class="form-label fw-bold">Nome do Pet:</label>
-      <input type="text" name="pet" id="pet" class="form-control" required>
-    </div>
+    <form method="POST">
+      <div class="mb-3">
+        <label class="form-label">Nome do Pet</label>
+        <input type="text" class="form-control" name="pet_nome" required>
+      </div>
 
-    <div class="mb-3">
-      <label for="servico" class="form-label fw-bold">Serviço:</label>
-      <select name="servico" id="servico" class="form-select" required>
-        <option value="">Selecione...</option>
-        <option value="Banho e Tosa">Banho e Tosa</option>
-        <option value="Consulta Veterinária">Consulta Veterinária</option>
-        <option value="Vacinação">Vacinação</option>
-        <option value="Hospedagem">Hospedagem</option>
-        <option value="Tosa Higiênica">Tosa Higiênica</option>
-      </select>
-    </div>
+      <div class="mb-3">
+        <label class="form-label">Serviço</label>
+        <select class="form-select" name="servico" required>
+          <option value="">Selecione</option>
+          <option>Banho</option>
+          <option>Tosa</option>
+          <option>Consulta Veterinária</option>
+          <option>Vacinação</option>
+        </select>
+      </div>
 
-    <div class="mb-3">
-      <label for="data" class="form-label fw-bold">Data do Agendamento:</label>
-      <input type="date" name="data" id="data" class="form-control" required>
-    </div>
+      <div class="mb-3">
+        <label class="form-label">Telefone de Contato</label>
+        <input type="tel" class="form-control" name="telefone" placeholder="(XX) XXXXX-XXXX" required pattern="\(\d{2}\)\s?\d{4,5}-\d{4}">
+      </div>
 
-    <div class="text-center">
-      <button type="submit" class="btn btn-success px-4">Agendar</button>
-    </div>
-  </form>
+      <div class="mb-3">
+        <label class="form-label">Data e Hora</label>
+        <input type="datetime-local" class="form-control" name="data_agendada" required>
+      </div>
+
+      <button class="btn btn-success w-100">Confirmar Agendamento</button>
+    </form>
+  </div>
 </div>
 
 <?php include 'layout_footer.php'; ?>

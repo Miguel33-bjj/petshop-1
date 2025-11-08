@@ -1,11 +1,7 @@
 <?php
 session_start();
 
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
-require_once __DIR__ . '/db/conexao.php'; // Caminho corrigido
+require_once __DIR__ . '/db/conexao.php';
 
 $erro = '';
 
@@ -19,18 +15,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $usuario = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($usuario && password_verify($senha, $usuario['senha'])) {
-            $_SESSION['usuario'] = $usuario;
-            header("Location: index.php");
-            exit;
+    $_SESSION['usuario'] = $usuario;
+
+    // Redireciona conforme o tipo de usuário
+    if ($usuario['tipo'] === 'admin') {
+        header("Location: painel_admin.php");
+    } else {
+        header("Location: index.php");
+    }
+    exit;
+
         } else {
             $erro = "❌ E-mail ou senha inválidos.";
         }
     } catch (PDOException $e) {
-        $erro = "Erro ao acessar o banco de dados: " . $e->getMessage();
+        $erro = "Erro ao acessar o banco: " . $e->getMessage();
     }
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -41,20 +43,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #fffdf8;
+      background-color: #f6fff8;
     }
     .card {
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
     .btn-success {
-      background-color: #1e8449;
+      background-color: #28a745;
       border: none;
       color: #fff;
       font-weight: 600;
     }
     .btn-success:hover {
-      background-color: #166d3b;
+      background-color: #218838;
     }
   </style>
 </head>
@@ -64,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <h3 class="text-center text-success fw-bold mb-3">🐾 Entrar</h3>
 
       <?php if (!empty($erro)): ?>
-        <div class="alert alert-danger text-center"><?= $erro ?></div>
+        <div class="alert alert-danger text-center"><?= htmlspecialchars($erro) ?></div>
       <?php endif; ?>
 
       <form method="POST">

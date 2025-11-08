@@ -1,33 +1,32 @@
 <?php
 session_start();
-require_once __DIR__ . '/conexao.php';
+require_once __DIR__ . '/db/conexao.php';
 $mensagem = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $nome  = trim($_POST['nome']);
-  $email = trim($_POST['email']);
-  $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
+    $nome  = trim($_POST['nome']);
+    $email = trim($_POST['email']);
+    $senha = password_hash($_POST['senha'], PASSWORD_DEFAULT);
 
-  try {
-    // Cadastra novo usuário
-    $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha) VALUES (:n, :e, :s)");
-    $stmt->execute([':n' => $nome, ':e' => $email, ':s' => $senha]);
+    try {
+        $stmt = $pdo->prepare("INSERT INTO usuarios (nome, email, senha) VALUES (:n, :e, :s)");
+        $stmt->execute([':n' => $nome, ':e' => $email, ':s' => $senha]);
 
-    // Login automático
-    $_SESSION['usuario'] = [
-      'nome' => $nome,
-      'email' => $email
-    ];
+        // Login automático após cadastro
+        $_SESSION['usuario'] = [
+            'nome' => $nome,
+            'email' => $email
+        ];
 
-    header('Location: index.php');
-    exit;
-  } catch (PDOException $e) {
-    if (str_contains($e->getMessage(), 'UNIQUE')) {
-      $mensagem = "❌ Este e-mail já está cadastrado.";
-    } else {
-      $mensagem = "Erro no cadastro: " . $e->getMessage();
+        header('Location: index.php');
+        exit;
+    } catch (PDOException $e) {
+        if (str_contains($e->getMessage(), 'UNIQUE')) {
+            $mensagem = "❌ Este e-mail já está cadastrado.";
+        } else {
+            $mensagem = "Erro no cadastro: " . $e->getMessage();
+        }
     }
-  }
 }
 ?>
 <!DOCTYPE html>
@@ -40,28 +39,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <style>
     body {
       font-family: 'Poppins', sans-serif;
-      background-color: #fffdf8;
+      background-color: #f6fff8;
     }
     .card {
       border-radius: 15px;
       box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
-    .btn-warning {
-      background-color: #ffb300;
+    .btn-success {
+      background-color: #28a745;
       border: none;
-      color: #222;
+      color: #fff;
       font-weight: 600;
     }
-    .btn-warning:hover {
-      background-color: #ffa000;
-      color: #fff;
+    .btn-success:hover {
+      background-color: #218838;
     }
   </style>
 </head>
 <body>
   <div class="container d-flex justify-content-center align-items-center vh-100">
     <div class="card p-4" style="max-width: 400px; width: 100%;">
-      <h3 class="text-center text-warning fw-bold mb-3">🐾 Criar Conta</h3>
+      <h3 class="text-center text-success fw-bold mb-3">🐾 Criar Conta</h3>
 
       <?php if ($mensagem): ?>
         <div class="alert alert-danger text-center"><?= htmlspecialchars($mensagem) ?></div>
@@ -77,11 +75,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="mb-3">
           <input type="password" class="form-control" name="senha" placeholder="Senha" required>
         </div>
-        <button class="btn btn-warning w-100">Cadastrar e Continuar</button>
+        <button class="btn btn-success w-100">Cadastrar e Continuar</button>
       </form>
 
       <p class="text-center mt-3">
-        Já tem conta? <a href="login.php" class="text-warning fw-semibold">Entrar</a>
+        Já tem conta? <a href="login.php" class="text-success fw-semibold">Entrar</a>
       </p>
     </div>
   </div>
